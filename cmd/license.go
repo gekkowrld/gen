@@ -45,7 +45,7 @@ e.g "gen license gpl3" to generate GNU GPL version 3`,
 			for lkeys := range src.LicenseMaps {
 				i++
 				meta, _ := src.Metadata(lkeys)
-				fmt.Printf("%s:\n%s\n", meta.Title, meta.Description)
+				fmt.Printf("%s: (%s)\n%s\n", meta.Title, lkeys, meta.Description)
 			}
 			os.Exit(0)
 		}
