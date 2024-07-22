@@ -47,6 +47,22 @@ func GitIgnore(ig GitInput) string {
 	return strings.TrimSpace(Unique(gitignore.String()))
 }
 
+func AllGitIgnore() {
+	files, err := gitignores.ReadDir("gitignore")
+	if err != nil {
+		log.Fatalf("%+v\n", err)
+	}
+
+	var __ag strings.Builder
+
+	for _, agi := range files {
+		file := strings.TrimSuffix(agi.Name(), ".gitignore")
+		__ag.WriteString(file + "\n")
+	}
+
+	fmt.Println(__ag.String())
+}
+
 func uniq(input string) string {
 	var uniqueLines strings.Builder
 	uLines := make(map[string]bool)

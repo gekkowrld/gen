@@ -35,7 +35,7 @@ Run `gen license --help` to view helpful information like flags and their defaul
 
 ## Available .gitignore
 
-_None available_
+Use `gen gitignore --all` to view all available gitignore templates.
 
 ## Help text
 
@@ -63,4 +63,4 @@ Use "gen [command] --help" for more information about a command.
 
 ## Author
 
-[GekkoWrld](https://codeberg.org/gekkowrld/)
+[Gekko Wrld](https://codeberg.org/gekkowrld/)
