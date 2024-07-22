@@ -3,9 +3,14 @@
 A tool to generate license and .gitignore files locally.
 This means that the binay is 'huuuuuuge', if this is unacceptable, look at this nice projects:
 
-<https://choosealicense.com/> (managed by GitHub)
-<https://github.com/tcnksm/license> (Uses GitHub Api, written in Go)
-<https://github.com/licenses/lice> (Uses template files which can enable 'add your license as you go' model, written in Python)
+- <https://choosealicense.com/> (managed by GitHub)
+- <https://github.com/tcnksm/license> (Uses GitHub Api, written in Go)
+- <https://github.com/licenses/lice> (Uses template files which can enable 'add your license as you go' model, written in Python)
+
+The files used here:
+
+- <https://github.com/github/choosealicense.com>
+- <https://github.com/github/gitignore>
 
 ## Installation
 
