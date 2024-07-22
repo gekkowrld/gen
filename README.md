@@ -14,17 +14,18 @@ The files used here:
 
 ## Installation
 
-Using go install
-
-```
-go install codeberg.org/gekkowrld/gen@latest
-```
-
 Build from source:
 
 - Clone the repository
-- Run `go build -ldflags "-s -w"` to build the executable.
-- Copy the binary to $PATH.
+- Run `make install` to build and install the executable.
+- The files will be copied to `$HOME/bin/gen` and `$HOME/.local/share/completions/gen.$SHELL`
+
+If on bash add this to `.bashrc`
+
+```bash
+export PATH=$HOME/bin:$PATH
+source $HOME/.local/share/completions/gen.bash
+```
 
 Run `gen completion $(basename ${0})` (your shell basically) to get the autocompletion text.
 

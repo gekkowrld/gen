@@ -35,10 +35,7 @@ func GitIgnore(ig GitInput) string {
 
 	// Add .gitignore file contents
 	if ig.IsInput {
-		fc, err := os.ReadFile(ig.Output)
-		if err != nil {
-			log.Fatalf("%+v\n", err)
-		}
+		fc, _ := os.ReadFile(ig.Output)
 		gitignore.WriteRune('\n')
 		gitignore.Write(fc)
 		gitignore.WriteRune('\n')
