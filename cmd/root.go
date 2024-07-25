@@ -32,7 +32,7 @@ A near bad clone of:
 https://github.com/generate/generate-license
 https://github.com/generate/generate-gitignore
 `,
-	Version: `0.0.1
+	Version: `0.0.3
 Copyright (C) 2024 Gekko Wrld.
 License GPLv3+: GNU GPL version 3 or later <https://gnu.org/licenses/gpl.html>
 This is free software: you are free to change and redistribute it.
