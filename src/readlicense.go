@@ -100,6 +100,17 @@ func extractText(fe ext) (string, error) {
 	}
 
 	var text string
+	blks := strings.SplitN(string(content), "&==&", 2)
+
+	// If the blks is less one, then return it
+	if len(blks) == 1 {
+		return strings.TrimSpace(blks[0]), nil
+	}
+	// If 0, then return an error
+	if len(blks) <= 0 {
+		return "", fmt.Errorf("no data in the provided file")
+	}
+
 	if fe.ismeta {
 		text = strings.SplitN(string(content), "&==&", 2)[0]
 	} else {
