@@ -20,6 +20,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strings"
 
 	"codeberg.org/gekkowrld/gen/src"
 	"github.com/spf13/cobra"
@@ -32,7 +33,8 @@ var gitignoreCmd = &cobra.Command{
 	Long:  `Create a .gitignore for different languages`,
 	Run: func(cmd *cobra.Command, args []string) {
 		if cmd.Flag("all").Changed {
-			src.AllGitIgnore()
+			gits := src.AllGitIgnore()
+			fmt.Println(strings.Join(gits, "\n"))
 			os.Exit(0)
 		}
 		if len(args) < 1 {
@@ -45,10 +47,10 @@ var gitignoreCmd = &cobra.Command{
 			fmt.Println(gitignores)
 		} else {
 			gitignores = src.GitIgnore(src.GitInput{Ignores: args, IsInput: true, Output: of})
-      err := src.FileWrite(gitignores, of)
-      if err != nil {
-        log.Fatalf("%+v\n", err)
-      }
+			err := src.FileWrite(gitignores, of)
+			if err != nil {
+				log.Fatalf("%+v\n", err)
+			}
 		}
 	},
 }
@@ -57,4 +59,5 @@ func init() {
 	rootCmd.AddCommand(gitignoreCmd)
 	gitignoreCmd.PersistentFlags().BoolP("all", "A", false, "List all the available gitignore templates")
 	gitignoreCmd.PersistentFlags().StringP("output", "o", ".gitignore", "The output file. use 1 for stdout")
+	gitignoreCmd.ValidArgs = src.AllGitIgnore()
 }

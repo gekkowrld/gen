@@ -150,4 +150,13 @@ func init() {
 	licenseCmd.PersistentFlags().StringP("output", "o", "LICENSE", "The path to the output file. 1 for stdout")
 	licenseCmd.PersistentFlags().BoolP("all", "A", false, "List all the licenses available")
 	licenseCmd.PersistentFlags().StringP("info", "i", "", "List information about a license")
+
+	// Create valid args
+	var v_args []string
+
+	for keys := range src.LicenseMaps {
+		v_args = append(v_args, keys)
+	}
+
+	licenseCmd.ValidArgs = v_args
 }
