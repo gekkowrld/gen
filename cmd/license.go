@@ -56,7 +56,7 @@ e.g "gen license gpl3" to generate GNU GPL version 3`,
 			printInfo(info)
 		}
 
-		if len(args) < 1 {
+		if len(args) < 1 && !cmd.Flag("template").Changed {
 			fmt.Fprintf(os.Stderr, "You must supply the license name\n\n")
 			cmd.Help()
 			os.Exit(1)
@@ -66,8 +66,13 @@ e.g "gen license gpl3" to generate GNU GPL version 3`,
 		var linput src.LicenseInput
 		linput.Author = cmd.Flag("author").Value.String()
 		linput.Year = cmd.Flag("year").Value.String()
-		linput.License = args[0]
 		output := cmd.Flag("output").Value.String()
+		if cmd.Flag("template").Changed {
+			linput.IsTemplate = true
+			linput.Template = cmd.Flag("template").Value.String()
+		} else {
+			linput.License = args[0]
+		}
 		license, err := src.License(linput)
 		if err != nil {
 			log.Fatalf("%+v", err)
@@ -150,6 +155,7 @@ func init() {
 	licenseCmd.PersistentFlags().StringP("output", "o", "LICENSE", "The path to the output file. 1 for stdout")
 	licenseCmd.PersistentFlags().BoolP("all", "A", false, "List all the licenses available")
 	licenseCmd.PersistentFlags().StringP("info", "i", "", "List information about a license")
+	licenseCmd.PersistentFlags().StringP("template", "t", "", "The template file to be used instead of the embended ones")
 
 	// Create valid args
 	var v_args []string

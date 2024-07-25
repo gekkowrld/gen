@@ -4,16 +4,19 @@ import (
 	"bytes"
 	"embed"
 	"fmt"
+	"os"
 	"strings"
 	"text/template"
 )
 
 // The values that the input expects
 type LicenseInput struct {
-	Project string
-	Year    string
-	Author  string
-	License string
+	Project    string
+	Year       string
+	Author     string
+	License    string
+	IsTemplate bool
+	Template   string
 }
 
 // The metadata of a license text
@@ -36,8 +39,19 @@ var LicenseMaps = map[string]string{
 	"mit":  "mit.txt",
 }
 
+// Take in the template to be used.
+// this will be used to generate the final license
 func License(input LicenseInput) (string, error) {
-	cont, err := extractText(input.License, false)
+	var exf ext
+
+	if input.IsTemplate {
+		exf.istmpl = true
+		exf.tmpl = input.Template
+	} else {
+		exf.input = input.License
+	}
+
+	cont, err := extractText(exf)
 	if err != nil {
 		return "", err
 	}
@@ -55,21 +69,38 @@ func License(input LicenseInput) (string, error) {
 	return output.String(), nil
 }
 
-func extractText(input string, meta bool) (string, error) {
-	file, ok := LicenseMaps[strings.ToLower(input)]
-	if !ok {
-		return "", fmt.Errorf("no license found for %s", input)
-	}
+type ext struct {
+	input  string
+	ismeta bool
+	istmpl bool
+	tmpl   string
+}
 
-	filePath := fmt.Sprintf("licenses/%s", file)
+func extractText(fe ext) (string, error) {
+	var content []byte
+	var err error
 
-	content, err := licenses.ReadFile(filePath)
-	if err != nil {
-		return "", fmt.Errorf("failed to read license file: %w", err)
+	if !fe.istmpl {
+
+		file, ok := LicenseMaps[strings.ToLower(fe.input)]
+		if !ok {
+			return "", fmt.Errorf("no license found for %s", fe.input)
+		}
+
+		filePath := fmt.Sprintf("licenses/%s", file)
+		content, err = licenses.ReadFile(filePath)
+		if err != nil {
+			return "", fmt.Errorf("failed to read license file: %w", err)
+		}
+	} else {
+		content, err = os.ReadFile(fe.tmpl)
+		if err != nil {
+			return "", err
+		}
 	}
 
 	var text string
-	if meta {
+	if fe.ismeta {
 		text = strings.SplitN(string(content), "&==&", 2)[0]
 	} else {
 		text = strings.SplitN(string(content), "&==&", 2)[1]
@@ -79,7 +110,7 @@ func extractText(input string, meta bool) (string, error) {
 
 func Metadata(name string) (LicenseMeta, error) {
 	var lm LicenseMeta
-	cont, err := extractText(name, true)
+	cont, err := extractText(ext{input: name, ismeta: true})
 	if err != nil {
 		return lm, err
 	}

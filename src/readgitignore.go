@@ -17,6 +17,14 @@ type GitInput struct {
 //go:embed gitignore/*.gitignore
 var gitignores embed.FS
 
+// Return the string format of the gitignore content that has been computed.
+// It takes in the GitInput struct.
+// If the user passes multiple `Ignores` then and an output file (optional), the following is done.
+//   - Append all the file contents into a strings.Builder for next manipulations.
+//     This step potentially has multiple duplicate files, e.g both `Go` and `C` have executables `*.exe`
+//   - Check if the file passed as output contains anything, if it does, then:
+//     add the content to as if it was got from a file.
+//   - Remove the duplicate lines and then return it.
 func GitIgnore(ig GitInput) string {
 	var gitignore strings.Builder
 	ignores := ig.Ignores
@@ -44,6 +52,8 @@ func GitIgnore(ig GitInput) string {
 	return strings.TrimSpace(Unique(gitignore.String()))
 }
 
+// Read from the 'directory' containing the .gitignore and then return the list.
+// The list is in form of array string.
 func AllGitIgnore() []string {
 	var gits []string
 	files, err := gitignores.ReadDir("gitignore")
@@ -59,6 +69,8 @@ func AllGitIgnore() []string {
 	return gits
 }
 
+// use the simple fact that go `map` doesn't accept duplicate keys.
+// using this, then just 'append' the keys and remove all that are the same
 func uniq(input string) string {
 	var uniqueLines strings.Builder
 	uLines := make(map[string]bool)
@@ -78,6 +90,7 @@ func uniq(input string) string {
 	return uniqueLines.String()
 }
 
+// Given a string, get the unique lines split in 'blocks'
 func Unique(input string) string {
 	var str strings.Builder
 	// Get the blocks
@@ -92,6 +105,18 @@ func Unique(input string) string {
 	return str.String()
 }
 
+// Split a string using '#' as the section 'header'
+// An example:
+//
+//	'''
+//	  # Go files
+//	  *.exe
+//	  # C files
+//	  *.exe
+//	  *.out
+//	'''
+//
+// This will be the split into two sections, the new lines between them is not useful as they are ignored.
 func SplitSec(input string) []string {
 	var s_sec []string
 
