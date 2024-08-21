@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"embed"
 	"fmt"
+	"log"
 	"os"
 	"strings"
 	"text/template"
@@ -15,6 +16,7 @@ type LicenseInput struct {
 	Year       string
 	Author     string
 	License    string
+	Output     string
 	IsTemplate bool
 	Template   string
 }
@@ -33,11 +35,6 @@ type LicenseMeta struct {
 
 //go:embed licenses/*.txt
 var licenses embed.FS
-
-var LicenseMaps = map[string]string{
-	"gpl3": "gpl-3.0.txt",
-	"mit":  "mit.txt",
-}
 
 // Take in the template to be used.
 // this will be used to generate the final license
@@ -76,9 +73,26 @@ type ext struct {
 	tmpl   string
 }
 
+func AllLicense() map[string]string {
+  lis := make(map[string]string)
+	files, err := licenses.ReadDir("licenses")
+	if err != nil {
+		log.Fatalf("%+v\n", err)
+	}
+
+	for _, agi := range files {
+    agin := strings.TrimSpace(agi.Name())
+		file := strings.TrimSuffix(agin, ".txt")
+    lis[file] = agin
+	}
+
+	return lis
+}
+
 func extractText(fe ext) (string, error) {
 	var content []byte
 	var err error
+  LicenseMaps := AllLicense()
 
 	if !fe.istmpl {
 
@@ -100,7 +114,7 @@ func extractText(fe ext) (string, error) {
 	}
 
 	var text string
-	blks := strings.SplitN(string(content), "&==&", 2)
+	blks := strings.SplitN(string(content), "|||", 2)
 
 	// If the blks is less one, then return it
 	if len(blks) == 1 {
@@ -143,7 +157,9 @@ func Metadata(name string) (LicenseMeta, error) {
 		}
 		if il && !strings.ContainsRune(line, ':') {
 			parts = strings.SplitN(line, "-", 2)
+      if len(parts) >= 2{
 			temp_v = append(temp_v, strings.TrimSpace(parts[1]))
+      }
 			continue
 		}
 
@@ -173,7 +189,10 @@ func Metadata(name string) (LicenseMeta, error) {
 		}
 
 		if !il && len(parts) > 0 {
-			val := strings.TrimSpace(parts[1])
+      var val string
+      if len(parts) >= 2{
+			val = strings.TrimSpace(parts[1])
+      }
 			switch strings.ToLower(strings.TrimSpace(parts[0])) {
 			case "title":
 				lm.Title = val

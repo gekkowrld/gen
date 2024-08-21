@@ -16,7 +16,7 @@ limitations:
   - liability
   - warranty
 
-&==&
+|||
 
 MIT License
 

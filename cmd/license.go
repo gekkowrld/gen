@@ -42,7 +42,7 @@ e.g "gen license gpl3" to generate GNU GPL version 3`,
 		if cmd.Flag("all").Changed {
 			fmt.Println("Available licenses:")
 			var i int
-			for lkeys := range src.LicenseMaps {
+			for lkeys := range src.AllLicense() {
 				i++
 				meta, _ := src.Metadata(lkeys)
 				fmt.Printf("%s: (%s)\n%s\n", meta.Title, lkeys, meta.Description)
@@ -56,7 +56,7 @@ e.g "gen license gpl3" to generate GNU GPL version 3`,
 			printInfo(info)
 		}
 
-		if len(args) < 1 && !cmd.Flag("template").Changed {
+		if len(args) < 1 && !cmd.Flag("template").Changed && !cmd.Flag("ask").Changed {
 			fmt.Fprintf(os.Stderr, "You must supply the license name\n\n")
 			cmd.Help()
 			os.Exit(1)
@@ -66,12 +66,17 @@ e.g "gen license gpl3" to generate GNU GPL version 3`,
 		var linput src.LicenseInput
 		linput.Author = cmd.Flag("author").Value.String()
 		linput.Year = cmd.Flag("year").Value.String()
+		linput.Output = cmd.Flag("output").Value.String()
+		linput.Project = cmd.Flag("project").Value.String()
 		output := cmd.Flag("output").Value.String()
 		if cmd.Flag("template").Changed {
 			linput.IsTemplate = true
 			linput.Template = cmd.Flag("template").Value.String()
-		} else {
+		} else if !cmd.Flag("ask").Changed {
 			linput.License = args[0]
+		}
+		if cmd.Flag("ask").Changed {
+			linput = src.AskLicense(linput)
 		}
 		license, err := src.License(linput)
 		if err != nil {
@@ -156,11 +161,12 @@ func init() {
 	licenseCmd.PersistentFlags().BoolP("all", "A", false, "List all the licenses available")
 	licenseCmd.PersistentFlags().StringP("info", "i", "", "List information about a license")
 	licenseCmd.PersistentFlags().StringP("template", "t", "", "The template file to be used instead of the embended ones")
+	licenseCmd.PersistentFlags().Bool("ask", false, "Open a prompt!")
 
 	// Create valid args
 	var v_args []string
 
-	for keys := range src.LicenseMaps {
+	for keys := range src.AllLicense() {
 		v_args = append(v_args, keys)
 	}
 
