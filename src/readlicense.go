@@ -74,16 +74,16 @@ type ext struct {
 }
 
 func AllLicense() map[string]string {
-  lis := make(map[string]string)
+	lis := make(map[string]string)
 	files, err := licenses.ReadDir("licenses")
 	if err != nil {
 		log.Fatalf("%+v\n", err)
 	}
 
 	for _, agi := range files {
-    agin := strings.TrimSpace(agi.Name())
+		agin := strings.TrimSpace(agi.Name())
 		file := strings.TrimSuffix(agin, ".txt")
-    lis[file] = agin
+		lis[file] = agin
 	}
 
 	return lis
@@ -92,7 +92,7 @@ func AllLicense() map[string]string {
 func extractText(fe ext) (string, error) {
 	var content []byte
 	var err error
-  LicenseMaps := AllLicense()
+	LicenseMaps := AllLicense()
 
 	if !fe.istmpl {
 
@@ -125,10 +125,15 @@ func extractText(fe ext) (string, error) {
 		return "", fmt.Errorf("no data in the provided file")
 	}
 
+	texts := strings.SplitN(string(content), "|||", 2)
 	if fe.ismeta {
-		text = strings.SplitN(string(content), "&==&", 2)[0]
+		if len(texts) >= 1 {
+			text = texts[0]
+		}
 	} else {
-		text = strings.SplitN(string(content), "&==&", 2)[1]
+		if len(texts) >= 2 {
+			text = texts[1]
+		}
 	}
 	return strings.TrimSpace(text), nil
 }
@@ -157,9 +162,9 @@ func Metadata(name string) (LicenseMeta, error) {
 		}
 		if il && !strings.ContainsRune(line, ':') {
 			parts = strings.SplitN(line, "-", 2)
-      if len(parts) >= 2{
-			temp_v = append(temp_v, strings.TrimSpace(parts[1]))
-      }
+			if len(parts) >= 2 {
+				temp_v = append(temp_v, strings.TrimSpace(parts[1]))
+			}
 			continue
 		}
 
@@ -189,10 +194,10 @@ func Metadata(name string) (LicenseMeta, error) {
 		}
 
 		if !il && len(parts) > 0 {
-      var val string
-      if len(parts) >= 2{
-			val = strings.TrimSpace(parts[1])
-      }
+			var val string
+			if len(parts) >= 2 {
+				val = strings.TrimSpace(parts[1])
+			}
 			switch strings.ToLower(strings.TrimSpace(parts[0])) {
 			case "title":
 				lm.Title = val

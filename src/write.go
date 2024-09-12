@@ -2,7 +2,7 @@ package src
 
 import "os"
 
-// A wrapper around the standard os.WriteFile
+// A thin wrapper around the standard os.WriteFile
 func FileWrite(content, file string) error {
-	return os.WriteFile(file, []byte(content), os.ModePerm)
+	return os.WriteFile(file, []byte(content), 0644)
 }

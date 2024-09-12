@@ -171,4 +171,5 @@ func init() {
 	}
 
 	licenseCmd.ValidArgs = v_args
+	licenseCmd.Flags().SetAnnotation("info", cobra.BashCompCustom, v_args)
 }
